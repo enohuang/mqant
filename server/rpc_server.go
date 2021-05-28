@@ -14,7 +14,8 @@ import (
 )
 
 type rpcServer struct {
-	exit chan chan error
+	//exit 变量没有作用
+	//exit chan chan error
 
 	sync.RWMutex
 	opts Options
@@ -30,7 +31,7 @@ func newRPCServer(opts ...Option) Server {
 	options := newOptions(opts...)
 	return &rpcServer{
 		opts: options,
-		exit: make(chan chan error),
+		//exit: make(chan chan error),
 	}
 }
 
@@ -39,6 +40,13 @@ func (s *rpcServer) Options() Options {
 	opts := s.opts
 	s.RUnlock()
 	return opts
+}
+
+func (s *rpcServer) SetAttribute(key,value string) error{
+	s.Lock()
+	s.opts.Metadata[key] = value
+	s.Unlock()
+	return nil
 }
 
 func (s *rpcServer) Init(opts ...Option) error {

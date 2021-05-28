@@ -132,7 +132,14 @@ func (s *service) Run() error {
 
 	// start reg loop
 	ex := make(chan bool)
-	go s.run(ex)
+	//保证定时器取消之后，再执行s.Stop()。 以免同时出现ServiceRegister与ServiceDeregister同时运行
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		s.run(ex)
+		wg.Done()
+	}()
 
 	//ch := make(chan os.Signal, 1)
 	//signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
@@ -146,5 +153,6 @@ func (s *service) Run() error {
 
 	// exit reg loop
 	close(ex)
+	wg.Wait()
 	return s.Stop()
 }

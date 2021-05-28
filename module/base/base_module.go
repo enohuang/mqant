@@ -131,8 +131,11 @@ func (m *BaseModule) OnInit(subclass module.RPCModule, app module.App, settings 
 		log.Warning("server OnInit fail id(%s) error(%s)", m.GetServerID(), err)
 	}
 	hostname, _ := os.Hostname()
-	server.Options().Metadata["hostname"] = hostname
-	server.Options().Metadata["pid"] = fmt.Sprintf("%v", os.Getpid())
+	//server.Options().Metadata["hostname"] = hostname
+	//server.Options().Metadata["pid"] = fmt.Sprintf("%v", os.Getpid())
+	//map是引用类型，封装一个方法避免数据竞争问题
+	server.SetAttribute("hostname", hostname)
+	server.SetAttribute("pid", fmt.Sprintf("%v", os.Getpid()))
 	ctx, cancel := context.WithCancel(context.Background())
 	m.exit = cancel
 	m.serviceStopeds = make(chan bool)
